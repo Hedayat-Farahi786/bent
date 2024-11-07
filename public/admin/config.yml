@@ -1,0 +1,52 @@
+backend:
+  name: git-gateway
+  branch: main # Change this to your main branch name if different
+
+# These lines enable editorial workflow
+publish_mode: editorial_workflow
+
+# Media files will be stored in the repo under public/uploads
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "projects"
+    label: "Projects"
+    folder: "content/projects"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Slug", name: "slug", widget: "string" }
+      - { label: "Category", name: "category", widget: "select", options: ["Tech Art", "Concept Art", "Comic Project"] }
+      - { label: "Description", name: "description", widget: "text" }
+      - { label: "Thumbnail", name: "thumbnail", widget: "image" }
+      - { label: "Content", name: "content", widget: "markdown" }
+      - { label: "Featured", name: "featured", widget: "boolean", default: false }
+      - { label: "Creation Date", name: "createdAt", widget: "datetime" }
+
+  - name: "pages"
+    label: "Pages"
+    files:
+      - label: "About"
+        name: "about"
+        file: "content/pages/about.md"
+        fields:
+          - { label: "Name", name: "name", widget: "string" }
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Profile Image", name: "image", widget: "image" }
+          - { label: "Bio", name: "bio", widget: "markdown" }
+          - label: "Social Links"
+            name: "social_links"
+            widget: "list"
+            fields:
+              - { label: "Platform", name: "platform", widget: "string" }
+              - { label: "URL", name: "url", widget: "string" }
+
+      - label: "Contact"
+        name: "contact"
+        file: "content/pages/contact.md"
+        fields:
+          - { label: "Email", name: "email", widget: "string" }
+          - { label: "Phone", name: "phone", widget: "string" }
+          - { label: "Location", name: "location", widget: "string" }
