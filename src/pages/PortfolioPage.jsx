@@ -1,14 +1,21 @@
 // File: src/pages/PortfolioPage.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { projects } from '../data/dummyData';
+import { useProjects } from '../hooks/useCmsData';
+import { Loading } from '../components/common/Loading';
+import ErrorBoundary from '../components/common/ErrorBoundary';
 
 const PortfolioPage = () => {
+  const { projects, loading, error } = useProjects();
   const [selectedCategory, setSelectedCategory] = useState('all');
 
+  if (loading) return <Loading />;
+  if (error) throw new Error(error);
+
+  const categories = ['all', ...new Set(projects.map(p => p.category))];
   const filteredProjects = selectedCategory === 'all' 
     ? projects 
-    : projects.filter(project => project.categorySlug === selectedCategory);
+    : projects.filter(project => project.category === selectedCategory);
 
   return (
     <div className="space-y-8 py-12">
@@ -22,30 +29,17 @@ const PortfolioPage = () => {
 
       {/* Category Filter */}
       <div className="flex flex-wrap justify-center gap-2 pb-8">
-        <button
-          onClick={() => setSelectedCategory('all')}
-          className={`px-4 py-2 rounded-full ${
-            selectedCategory === 'all'
-              ? 'bg-indigo-600 text-white'
-              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-          }`}
-        >
-          All Works
-        </button>
-        {Array.from(new Set(projects.map(p => ({
-          slug: p.categorySlug,
-          name: p.category
-        })))).map(category => (
+        {categories.map((category) => (
           <button
-            key={category.slug}
-            onClick={() => setSelectedCategory(category.slug)}
+            key={category}
+            onClick={() => setSelectedCategory(category)}
             className={`px-4 py-2 rounded-full ${
-              selectedCategory === category.slug
+              selectedCategory === category
                 ? 'bg-indigo-600 text-white'
                 : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
             }`}
           >
-            {category.name}
+            {category === 'all' ? 'All Works' : category}
           </button>
         ))}
       </div>
@@ -54,7 +48,7 @@ const PortfolioPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredProjects.map((project) => (
           <Link
-            key={project.id}
+            key={project.slug}
             to={`/portfolio/${project.slug}`}
             className="group"
           >
@@ -64,6 +58,7 @@ const PortfolioPage = () => {
                   src={project.thumbnail}
                   alt={project.title}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </div>
               <div className="p-6">
@@ -85,4 +80,10 @@ const PortfolioPage = () => {
   );
 };
 
-export default PortfolioPage;
+export default function PortfolioWithErrorBoundary() {
+  return (
+    <ErrorBoundary>
+      <PortfolioPage />
+    </ErrorBoundary>
+  );
+}

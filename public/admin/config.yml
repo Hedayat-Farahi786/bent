@@ -1,29 +1,76 @@
+# File: public/admin/config.yml
 backend:
   name: git-gateway
-  branch: main # Change this to your main branch name if different
+  branch: master
 
-# These lines enable editorial workflow
+# These lines enable editorial workflow (optional but recommended)
 publish_mode: editorial_workflow
 
-# Media files will be stored in the repo under public/uploads
-media_folder: "public/uploads"
-public_folder: "/uploads"
+# Media settings
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+media_library:
+  name: uploadcare # or "cloudinary" if you prefer
+  config:
+    publicKey: "YOUR_PUBLIC_KEY" # Optional
+    multiple: true # Optional
+    tabs: "file camera url" # Optional
 
+# Site URL
+site_url: "https://bent-website.netlify.app"
+display_url: "https://bent-website.netlify.app"
+
+# Collections
 collections:
   - name: "projects"
     label: "Projects"
     folder: "content/projects"
     create: true
     slug: "{{slug}}"
+    summary: "{{title}} - {{category}}"
+    sortable_fields: ['title', 'category', 'createdAt']
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - { label: "Slug", name: "slug", widget: "string" }
-      - { label: "Category", name: "category", widget: "select", options: ["Tech Art", "Concept Art", "Comic Project"] }
+      - { 
+          label: "Slug", 
+          name: "slug", 
+          widget: "string",
+          pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', "Must be URL friendly"]
+        }
+      - {
+          label: "Category",
+          name: "category",
+          widget: "select",
+          options: ["Tech Art", "Concept Art", "Comic Project"],
+        }
       - { label: "Description", name: "description", widget: "text" }
-      - { label: "Thumbnail", name: "thumbnail", widget: "image" }
+      - { 
+          label: "Thumbnail", 
+          name: "thumbnail", 
+          widget: "image",
+          choose_url: false,
+          media_folder: "/uploads"
+        }
+      - { 
+          label: "Images", 
+          name: "images", 
+          widget: "list",
+          summary: "{{fields.image}}",
+          field: { label: "Image", name: "image", widget: "image" }
+        }
       - { label: "Content", name: "content", widget: "markdown" }
-      - { label: "Featured", name: "featured", widget: "boolean", default: false }
-      - { label: "Creation Date", name: "createdAt", widget: "datetime" }
+      - {
+          label: "Featured",
+          name: "featured",
+          widget: "boolean",
+          default: false,
+        }
+      - { 
+          label: "Creation Date", 
+          name: "createdAt", 
+          widget: "datetime",
+          format: "YYYY-MM-DD HH:mm:ss"
+        }
 
   - name: "pages"
     label: "Pages"
@@ -34,19 +81,66 @@ collections:
         fields:
           - { label: "Name", name: "name", widget: "string" }
           - { label: "Title", name: "title", widget: "string" }
-          - { label: "Profile Image", name: "image", widget: "image" }
+          - { 
+              label: "Profile Image", 
+              name: "image", 
+              widget: "image",
+              required: false
+            }
           - { label: "Bio", name: "bio", widget: "markdown" }
           - label: "Social Links"
-            name: "social_links"
+            name: "socialLinks"
             widget: "list"
+            summary: "{{fields.platform}}: {{fields.url}}"
             fields:
-              - { label: "Platform", name: "platform", widget: "string" }
-              - { label: "URL", name: "url", widget: "string" }
+              - { 
+                  label: "Platform", 
+                  name: "platform", 
+                  widget: "select",
+                  options: ["GitHub", "LinkedIn", "Twitter", "Instagram", "Behance", "Other"]
+                }
+              - { 
+                  label: "URL", 
+                  name: "url", 
+                  widget: "string",
+                  pattern: ['https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)', "Must be a valid URL"]
+                }
+              - {
+                  label: "Icon",
+                  name: "icon",
+                  widget: "string",
+                  required: false
+                }
 
       - label: "Contact"
         name: "contact"
         file: "content/pages/contact.md"
         fields:
           - { label: "Email", name: "email", widget: "string" }
-          - { label: "Phone", name: "phone", widget: "string" }
-          - { label: "Location", name: "location", widget: "string" }
+          - { 
+              label: "Phone", 
+              name: "phone", 
+              widget: "string",
+              required: false
+            }
+          - { 
+              label: "Location", 
+              name: "location", 
+              widget: "string",
+              required: false
+            }
+          - {
+              label: "Form Success Message",
+              name: "successMessage",
+              widget: "string",
+              default: "Thank you for your message. I will get back to you soon!"
+            }
+
+# Search
+search: true
+
+# Locale
+locale: 'en'
+
+# Show preview links
+show_preview_links: true
